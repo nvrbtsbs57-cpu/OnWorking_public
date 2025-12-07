@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import os
 import signal
 import subprocess
 import sys
@@ -40,6 +39,7 @@ def main() -> None:
             "memecoin en PAPER_ONCHAIN pour M10."
         )
     )
+
     parser.add_argument(
         "--no-dashboard",
         action="store_true",
@@ -48,13 +48,24 @@ def main() -> None:
     parser.add_argument(
         "--no-runtime",
         action="store_true",
-        help="Ne pas lancer le runtime memecoin (test_runtime_memecoin.py).",
+        help=(
+            "Ne pas lancer le runtime memecoin "
+            "(run_m10_memecoin_runtime.py)."
+        ),
     )
 
     # Paramètres runtime memecoin (avec les valeurs que tu utilisais déjà)
     parser.add_argument("--symbol", default="SOL/USDC", help="Symbol à trader.")
-    parser.add_argument("--chain", default="solana", help="Chain (solana, base, bsc, etc.).")
-    parser.add_argument("--wallet", default="sniper_sol", help="ID du wallet logique (config.json).")
+    parser.add_argument(
+        "--chain",
+        default="solana",
+        help="Chain (solana, base, bsc, etc.).",
+    )
+    parser.add_argument(
+        "--wallet",
+        default="sniper_sol",
+        help="ID du wallet logique (config.json).",
+    )
     parser.add_argument(
         "--engine-notional",
         default="200",
@@ -73,7 +84,10 @@ def main() -> None:
     parser.add_argument(
         "--sleep",
         default="5",
-        help="Pause en secondes entre deux cycles d'exécution (string, passé tel quel).",
+        help=(
+            "Pause en secondes entre deux cycles d'exécution "
+            "(string, passé tel quel)."
+        ),
     )
     parser.add_argument(
         "--verbose",
@@ -86,7 +100,7 @@ def main() -> None:
     processes: List[subprocess.Popen] = []
 
     print(f"[start_all_m10] ROOT_DIR = {ROOT_DIR}")
-    print(f"[start_all_m10] PYTHON   = {PYTHON}")
+    print(f"[start_all_m10] PYTHON = {PYTHON}")
     print()
 
     try:
@@ -105,7 +119,7 @@ def main() -> None:
         if not args.no_runtime:
             runtime_cmd: List[str] = [
                 PYTHON,
-                "scripts/test_runtime_memecoin.py",
+                "scripts/run_m10_memecoin_runtime.py",
                 "--symbol",
                 args.symbol,
                 "--chain",
@@ -142,12 +156,14 @@ def main() -> None:
         while processes:
             alive = [p for p in processes if p.poll() is None]
             if len(alive) != len(processes):
-                print("[start_all_m10] Un des processus s'est terminé. Arrêt global.")
+                print("[start_all_m10] Un des processus s'est terminé.")
+                print("[start_all_m10] Arrêt global.")
                 break
             time.sleep(1.0)
 
     except KeyboardInterrupt:
         print("\n[start_all_m10] Ctrl+C détecté, arrêt des processus...")
+
     finally:
         # Tentative d'arrêt propre
         for p in processes:

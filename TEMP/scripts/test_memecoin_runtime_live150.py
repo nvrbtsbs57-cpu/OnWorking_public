@@ -19,7 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # --- Imports projet ---
 
-from bot.core.logging import get_logger
+from bot.core.logging import get_logger, setup_logging
 from bot.wallets.runtime_manager import RuntimeWalletManager
 from bot.trading.execution import ExecutionEngine
 from bot.trading.paper_trader import PaperTrader, PaperTraderConfig
@@ -30,10 +30,8 @@ from bot.strategies.memecoin_farming.agent import (
     build_memecoin_strategy_from_config,
 )
 
-log = get_logger("test_memecoin_runtime_live150")
-
 CONFIG_PATH = PROJECT_ROOT / "config.json"
-
+log = get_logger("test_memecoin_runtime_live150")
 
 # ---------- Helpers ----------
 
@@ -43,6 +41,27 @@ def load_config() -> Dict[str, Any]:
         raise SystemExit(f"[FATAL] config.json introuvable à {CONFIG_PATH}")
     with CONFIG_PATH.open("r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def setup_logging_from_config(raw_cfg: Dict[str, Any]) -> None:
+    """
+    Initialise le logging global à partir de config.json["logging"].
+
+    Ex:
+    "logging": { "level": "INFO", "json": true }
+    """
+    level = "INFO"
+    json_mode = True
+
+    try:
+        log_cfg = (raw_cfg.get("logging") or {}) if isinstance(raw_cfg, dict) else {}
+        level = str(log_cfg.get("level", level))
+        json_mode = bool(log_cfg.get("json", json_mode))
+    except Exception:
+        # En cas de souci de parsing, on garde les valeurs par défaut
+        pass
+
+    setup_logging(level=level, json_mode=json_mode)
 
 
 def build_runtime_wallet_manager(cfg: Dict[str, Any]) -> RuntimeWalletManager:
@@ -56,7 +75,8 @@ def build_runtime_wallet_manager(cfg: Dict[str, Any]) -> RuntimeWalletManager:
     except TypeError:
         log.error(
             "RuntimeWalletManager.from_config(...) a une signature différente.\n"
-            "Ouvre bot/wallets/runtime_manager.py et adapte build_runtime_wallet_manager()."
+            "Ouvre bot/wallets/runtime_manager.py et adapte "
+            "build_runtime_wallet_manager()."
         )
         raise
     log.info("RuntimeWalletManager initialisé à partir de config.json.")
@@ -89,8 +109,10 @@ def build_memecoin_engine(cfg: Dict[str, Any]) -> MemecoinStrategyEngine:
 
 
 def main(loop_sleep: float = 5.0) -> None:
-    log.info("=== M10 – test_memecoin_runtime_live150 (PAPER_ONCHAIN) ===")
     cfg = load_config()
+    setup_logging_from_config(cfg)
+
+    log.info("=== M10 – test_memecoin_runtime_live150 (PAPER_ONCHAIN) ===")
 
     runtime_wallet_manager = build_runtime_wallet_manager(cfg)
     exec_engine = build_execution_engine(runtime_wallet_manager)
@@ -102,6 +124,10 @@ def main(loop_sleep: float = 5.0) -> None:
     try:
         while True:
             iteration += 1
+
+            # 0) Optionnel : refresh_balances pour respecter l'interface WalletManagerIface
+            if hasattr(runtime_wallet_manager, "refresh_balances"):
+                runtime_wallet_manager.refresh_balances()
 
             # 1) Tick wallets (fees, buffers, flows…)
             if hasattr(runtime_wallet_manager, "on_tick"):
