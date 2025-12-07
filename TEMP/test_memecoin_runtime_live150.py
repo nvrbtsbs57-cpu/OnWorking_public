@@ -47,18 +47,22 @@ def load_config() -> Dict[str, Any]:
 
 def build_runtime_wallet_manager(cfg: Dict[str, Any]) -> RuntimeWalletManager:
     """
-    Construit le RuntimeWalletManager pour le profil LIVE_150.
+    Construit le RuntimeWalletManager à partir de config.json.
+
+    Le profil LIVE_150 est supposé être géré dans la config elle-même
+    (par exemple via une section wallets/profiles).
     """
     try:
-        rwm = RuntimeWalletManager.from_config(cfg, "LIVE_150")  # profil LIVE_150
+        rwm = RuntimeWalletManager.from_config(cfg)  # un seul argument
     except TypeError as exc:
         log.error(
-            "RuntimeWalletManager.from_config(...) a une signature différente.\n"
-            "Ouvre bot/wallets/runtime_manager.py et adapte build_runtime_wallet_manager()."
+            "RuntimeWalletManager.from_config(...) a encore une signature différente.\n"
+            "Ouvre bot/wallets/runtime_manager.py et ajuste cette fonction en conséquence."
         )
         raise
-    log.info("RuntimeWalletManager initialisé (profil LIVE_150).")
+    log.info("RuntimeWalletManager initialisé à partir de config.json.")
     return rwm
+
 
 
 
