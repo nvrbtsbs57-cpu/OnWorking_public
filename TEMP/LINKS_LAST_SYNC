@@ -523,6 +523,9 @@ TEMP/scripts/test_kill_switch_live150.py
 TEMP/scripts/test_live150_finance.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_live150_finance.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_live150_finance.py
+TEMP/scripts/test_m10_execution_with_risk_memecoin.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_m10_execution_with_risk_memecoin.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_m10_execution_with_risk_memecoin.py
 TEMP/scripts/test_memecoin_paper_trades_sol.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_memecoin_paper_trades_sol.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_memecoin_paper_trades_sol.py
