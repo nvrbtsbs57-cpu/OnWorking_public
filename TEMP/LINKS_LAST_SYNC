@@ -361,6 +361,9 @@ TEMP/quick_export_temp.sh
 TEMP/run_export_temp.sh
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/run_export_temp.sh
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/run_export_temp.sh
+TEMP/run_m10_memecoin_runtime.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/run_m10_memecoin_runtime.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/run_m10_memecoin_runtime.py
 TEMP/runtime_manager.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/runtime_manager.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/runtime_manager.py
@@ -430,6 +433,9 @@ TEMP/scripts/run_memecoin_runtime.py
 TEMP/scripts/run_runtime_memecoin.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/run_runtime_memecoin.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/run_runtime_memecoin.py
+TEMP/scripts/runtime_m10.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/runtime_m10.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/runtime_m10.py
 TEMP/scripts/runtime.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/runtime.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/runtime.py
@@ -628,6 +634,9 @@ TEMP/SPEC_BOT_GODMODE.md
 TEMP/test_agent_events_pipeline_with_wallets.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/test_agent_events_pipeline_with_wallets.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/test_agent_events_pipeline_with_wallets.py
+TEMP/test_m10_execution_with_risk_memecoin.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/test_m10_execution_with_risk_memecoin.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/test_m10_execution_with_risk_memecoin.py
 TEMP/test_memecoin_runtime_live150.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/test_memecoin_runtime_live150.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/test_memecoin_runtime_live150.py
