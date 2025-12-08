@@ -1,5 +1,4 @@
 # file: bot/strategies/memecoin_farming/runtime.py
-
 from __future__ import annotations
 
 import json
@@ -23,9 +22,9 @@ from bot.strategies.memecoin_farming.agent import (
 # Paths / config
 # ---------------------------------------------------------------------------
 
-# On part du principe que ce fichier est dans:
-#   <PROJECT_ROOT>/bot/strategies/memecoin_farming/runtime.py
-# donc parents[3] = <PROJECT_ROOT>
+# Ce fichier est dans:
+#   bot/strategies/memecoin_farming/runtime.py
+# donc parents[3] = racine projet BOT_GODMODE/BOT_GODMODE
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 _CONFIG_PATH = _PROJECT_ROOT / "config.json"
 
@@ -41,10 +40,9 @@ def load_config() -> Dict[str, Any]:
 
 
 def setup_logging_from_config(raw_cfg: Dict[str, Any]) -> None:
-    """
-    Initialise le logging global à partir de config["logging"].
+    """Initialise le logging global à partir de config["logging"].
 
-    Exemple de bloc dans config.json:
+    Exemple dans config.json :
 
       "logging": {
         "level": "INFO",
@@ -61,7 +59,7 @@ def setup_logging_from_config(raw_cfg: Dict[str, Any]) -> None:
         level = str(log_cfg.get("level", level))
         json_mode = bool(log_cfg.get("json", json_mode))
     except Exception:
-        # On reste tolérant: on garde les valeurs par défaut
+        # tolérant, on garde les valeurs par défaut
         pass
 
     setup_logging(level=level, json_mode=json_mode)
@@ -71,13 +69,11 @@ def setup_logging_from_config(raw_cfg: Dict[str, Any]) -> None:
 # Builders (wallets, exec, stratégie)
 # ---------------------------------------------------------------------------
 
-
 def build_runtime_wallet_manager(
     cfg: Dict[str, Any],
     logger_: Optional[logging.Logger] = None,
 ) -> RuntimeWalletManager:
-    """
-    Construit le RuntimeWalletManager à partir de config.json.
+    """Construit le RuntimeWalletManager à partir de config.json.
 
     S'appuie sur RuntimeWalletManager.from_config(cfg, logger=...).
     """
@@ -90,6 +86,7 @@ def build_runtime_wallet_manager(
             "Adapte build_runtime_wallet_manager() en conséquence."
         )
         raise
+
     log.info("RuntimeWalletManager initialisé à partir de config.json.")
     return mgr
 
@@ -98,16 +95,17 @@ def build_execution_engine(
     runtime_wallet_manager: RuntimeWalletManager,
     logger_: Optional[logging.Logger] = None,
 ) -> ExecutionEngine:
-    """
-    Construit l'ExecutionEngine PAPER (PaperTrader + RuntimeWalletManager).
-    """
+    """Construit l'ExecutionEngine PAPER (PaperTrader + RuntimeWalletManager)."""
     log = logger_ or _log
+
     pt_cfg = PaperTraderConfig.from_env()
     paper_trader = PaperTrader(config=pt_cfg)
+
     exec_engine = ExecutionEngine(
         inner_engine=paper_trader,
         wallet_manager=runtime_wallet_manager,
     )
+
     log.info(
         "ExecutionEngine PAPER initialisé avec PaperTrader + RuntimeWalletManager "
         "(trades -> data/godmode/trades.jsonl)."
@@ -119,14 +117,16 @@ def build_memecoin_engine(
     cfg: Dict[str, Any],
     logger_: Optional[logging.Logger] = None,
 ) -> MemecoinStrategyEngine:
-    """
-    Construit le moteur de stratégie memecoin via la factory officielle.
+    """Construit le moteur de stratégie memecoin via la factory officielle.
 
     Délègue à build_memecoin_strategy_from_config() défini dans agent.py.
     """
     log = logger_ or _log
     engine = build_memecoin_strategy_from_config(cfg, logger_=log)
-    log.info("MemecoinStrategyEngine initialisé via build_memecoin_strategy_from_config().")
+    log.info(
+        "MemecoinStrategyEngine initialisé via "
+        "build_memecoin_strategy_from_config()."
+    )
     return engine
 
 
@@ -134,15 +134,14 @@ def build_memecoin_engine(
 # Config runtime (override CLI)
 # ---------------------------------------------------------------------------
 
-
 @dataclass
 class MemecoinRuntimeConfig:
-    """
-    Config runtime "live-like" pour la strat memecoin.
+    """Config runtime "live-like" pour la strat memecoin.
 
-    Ces valeurs peuvent être override par:
-      - config.json["strategies"]["memecoin_farming"]["pairs"][0]
-      - les arguments CLI (symbol, chain, wallet, engine_notional, exec_min, exec_max, sleep)
+    Ces valeurs peuvent être override par :
+    - config.json["strategies"]["memecoin_farming"]["pairs"][0]
+    - les arguments CLI (symbol, chain, wallet, engine_notional,
+      exec_min, exec_max, sleep)
     """
 
     symbol: str = "SOL/USDC"
@@ -164,13 +163,16 @@ class MemecoinRuntimeConfig:
 # Objet runtime (boucle principale)
 # ---------------------------------------------------------------------------
 
-
 class MemecoinRuntime:
-    """
-    Colle runtime pour la strat memecoin en mode PAPER_ONCHAIN (M10):
+    """Colle runtime pour la strat memecoin en mode PAPER_ONCHAIN (M10).
 
-      config.json -> RuntimeWalletManager -> PaperTrader -> ExecutionEngine
-      -> MemecoinStrategyEngine
+    Chaîne de responsabilité :
+
+      config.json
+        -> RuntimeWalletManager
+        -> PaperTrader
+        -> ExecutionEngine
+        -> MemecoinStrategyEngine
 
     Cette classe NE fait que de la compta / routing interne.
     Aucune TX on-chain réelle n'est envoyée ici.
@@ -192,15 +194,14 @@ class MemecoinRuntime:
         self.execution_engine = execution_engine
         self.memecoin_engine = memecoin_engine
         self.log = logger_ or _log
-
         self._iteration = 0
 
     # ------------- Overrides CLI helpers -------------
 
     def apply_namespace_overrides(self, ns: Any) -> None:
-        """
-        Applique les overrides provenant d'un argparse.Namespace (ou objet
-        similaire) si présents. Tolérant: ignore les attributs manquants.
+        """Applique les overrides provenant d'un argparse.Namespace.
+
+        Tolérant: ignore les attributs manquants.
         """
         if ns is None:
             return
@@ -225,7 +226,8 @@ class MemecoinRuntime:
                 self.config.engine_notional_usd = Decimal(str(eng_not))
             except Exception:
                 self.log.exception(
-                    "MemecoinRuntime: impossible de parser engine_notional=%r", eng_not
+                    "MemecoinRuntime: impossible de parser engine_notional=%r",
+                    eng_not,
                 )
 
         exec_min = getattr(ns, "exec_min", None)
@@ -234,7 +236,8 @@ class MemecoinRuntime:
                 self.config.exec_min_notional_usd = Decimal(str(exec_min))
             except Exception:
                 self.log.exception(
-                    "MemecoinRuntime: impossible de parser exec_min=%r", exec_min
+                    "MemecoinRuntime: impossible de parser exec_min=%r",
+                    exec_min,
                 )
 
         exec_max = getattr(ns, "exec_max", None)
@@ -243,7 +246,8 @@ class MemecoinRuntime:
                 self.config.exec_max_notional_usd = Decimal(str(exec_max))
             except Exception:
                 self.log.exception(
-                    "MemecoinRuntime: impossible de parser exec_max=%r", exec_max
+                    "MemecoinRuntime: impossible de parser exec_max=%r",
+                    exec_max,
                 )
 
         slp = getattr(ns, "sleep", None)
@@ -252,14 +256,14 @@ class MemecoinRuntime:
                 self.config.sleep_seconds = float(slp)
             except Exception:
                 self.log.exception(
-                    "MemecoinRuntime: impossible de parser sleep=%r", slp
+                    "MemecoinRuntime: impossible de parser sleep=%r",
+                    slp,
                 )
 
     # ------------- Tick loop -------------
 
     def _fetch_signals(self) -> Sequence[Any]:
-        """
-        Récupère les signaux memecoin pour ce tick.
+        """Récupère les signaux memecoin pour ce tick.
 
         On privilégie next_signals(), mais on garde generate_signals()
         en fallback pour compat.
@@ -279,25 +283,26 @@ class MemecoinRuntime:
         return []
 
     def run_once(self) -> int:
-        """
-        Exécute un tick de runtime:
+        """Exécute un tick de runtime.
 
-          1) refresh_balances() sur RuntimeWalletManager (si dispo)
-          2) on_tick() sur RuntimeWalletManager (fees, flows, snapshots…)
-          3) next_signals() sur MemecoinStrategyEngine
-          4) exécution de chaque signal via ExecutionEngine
-          5) on_tick() sur MemecoinStrategyEngine (hook no-op pour l'instant)
+        1) refresh_balances() sur RuntimeWalletManager (si dispo)
+        2) on_tick() sur RuntimeWalletManager (fees, flows, snapshots…)
+        3) next_signals() sur MemecoinStrategyEngine
+        4) exécution de chaque signal via ExecutionEngine
+        5) on_tick() sur MemecoinStrategyEngine (hook no-op pour l'instant)
 
         Retourne le nombre de signaux exécutés.
         """
         self._iteration += 1
 
-        # 0) Optionnel: refresh_balances
+        # 0) Optionnel : refresh_balances
         if hasattr(self.wallet_manager, "refresh_balances"):
             try:
                 self.wallet_manager.refresh_balances()  # type: ignore[call-arg]
             except Exception:
-                self.log.exception("Erreur dans wallet_manager.refresh_balances()")
+                self.log.exception(
+                    "Erreur dans wallet_manager.refresh_balances()"
+                )
 
         # 1) Tick wallets (flows, fees, snapshots)
         if hasattr(self.wallet_manager, "on_tick"):
@@ -310,7 +315,9 @@ class MemecoinRuntime:
         try:
             signals = list(self._fetch_signals())
         except Exception:
-            self.log.exception("Erreur lors de la génération des signaux memecoin")
+            self.log.exception(
+                "Erreur lors de la génération des signaux memecoin"
+            )
             signals = []
 
         # 3) Exécuter les signaux via ExecutionEngine
@@ -321,7 +328,8 @@ class MemecoinRuntime:
                 executed += 1
             except Exception:
                 self.log.exception(
-                    "Erreur lors de execution_engine.execute_signal(signal=%r)", sig
+                    "Erreur lors de execution_engine.execute_signal(signal=%r)",
+                    sig,
                 )
 
         # 4) Hook on_tick() sur la stratégie (si disponible)
@@ -337,13 +345,10 @@ class MemecoinRuntime:
             len(signals),
             executed,
         )
-
         return executed
 
     def run_forever(self, *, max_ticks: Optional[int] = None) -> None:
-        """
-        Boucle infinie (ou limitée par max_ticks) pour le runtime memecoin.
-        """
+        """Boucle infinie (ou limitée par max_ticks) pour le runtime memecoin."""
         tick = 0
         sleep_s = float(self.config.sleep_seconds)
 
@@ -357,15 +362,23 @@ class MemecoinRuntime:
             while True:
                 tick += 1
                 if max_ticks is not None and tick > max_ticks:
-                    self.log.info("max_ticks=%d atteint, arrêt du runtime.", max_ticks)
+                    self.log.info(
+                        "max_ticks=%d atteint, arrêt du runtime.",
+                        max_ticks,
+                    )
                     break
 
                 self.run_once()
                 time.sleep(sleep_s)
+
         except KeyboardInterrupt:
-            self.log.info("Interruption utilisateur (Ctrl+C), arrêt du runtime memecoin.")
+            self.log.info(
+                "Interruption utilisateur (Ctrl+C), arrêt du runtime memecoin."
+            )
         except Exception:
-            self.log.exception("Erreur fatale dans MemecoinRuntime.run_forever().")
+            self.log.exception(
+                "Erreur fatale dans MemecoinRuntime.run_forever()."
+            )
             raise
 
 
@@ -373,13 +386,11 @@ class MemecoinRuntime:
 # Factory principale: build_default_runtime
 # ---------------------------------------------------------------------------
 
-
 def _build_runtime_config_from_global(cfg: Dict[str, Any]) -> MemecoinRuntimeConfig:
-    """
-    Initialise une MemecoinRuntimeConfig à partir de config.json:
+    """Initialise une MemecoinRuntimeConfig à partir de config.json.
 
-      - strategies.memecoin_farming.pairs[0]
-      - RUNTIME_TICK_INTERVAL_SECONDS (si présent)
+    - strategies.memecoin_farming.pairs[0]
+    - RUNTIME_TICK_INTERVAL_SECONDS (si présent)
     """
     rt_cfg = MemecoinRuntimeConfig()
 
@@ -405,24 +416,22 @@ def _build_runtime_config_from_global(cfg: Dict[str, Any]) -> MemecoinRuntimeCon
         raw_sleep = cfg.get("RUNTIME_TICK_INTERVAL_SECONDS")
         if raw_sleep is not None:
             rt_cfg.sleep_seconds = float(raw_sleep)
+
     except Exception:
         _log.exception(
-            "_build_runtime_config_from_global: impossible d'extraire la config "
-            "memecoin_farming depuis config.json, valeurs par défaut conservées."
+            "_build_runtime_config_from_global: impossible d'extraire la "
+            "config memecoin_farming depuis config.json, "
+            "valeurs par défaut conservées."
         )
 
     return rt_cfg
 
 
 def build_default_runtime(*args: Any, **kwargs: Any) -> MemecoinRuntime:
-    """
-    Factory principale utilisée par scripts/run_m10_memecoin_runtime.py.
+    """Factory principale utilisée par scripts/run_m10_memecoin_runtime.py.
 
     On reste TRES tolérant sur la signature:
-      - args[0] peut être un argparse.Namespace (override CLI),
-      - kwargs peut contenir logger_ ou logger.
 
-    Exemple d'utilisation attendue:
       runtime = build_default_runtime()
       runtime = build_default_runtime(logger_=logger)
       runtime = build_default_runtime(args_namespace, logger_=logger)

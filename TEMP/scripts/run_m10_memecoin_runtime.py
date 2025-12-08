@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import argparse
@@ -38,12 +39,14 @@ def parse_args() -> argparse.Namespace:
         default="sniper_sol",
         help="Logical wallet id (default: sniper_sol).",
     )
-
     parser.add_argument(
         "--engine-notional",
         type=float,
         default=200.0,
-        help="Notional in USD used inside the strategy engine (default: 200.0).",
+        help=(
+            "Notional in USD used inside the strategy engine "
+            "(default: 200.0)."
+        ),
     )
     parser.add_argument(
         "--exec-min",
@@ -57,7 +60,6 @@ def parse_args() -> argparse.Namespace:
         default=6.0,
         help="Max execution notional in USD (default: 6.0).",
     )
-
     parser.add_argument(
         "--sleep",
         type=float,
@@ -68,10 +70,7 @@ def parse_args() -> argparse.Namespace:
         "--ticks",
         type=int,
         default=0,
-        help=(
-            "Number of ticks to run before exit. "
-            "0 means run forever (default: 0)."
-        ),
+        help="Number of ticks to run before exit. 0 means run forever.",
     )
     parser.add_argument(
         "--verbose",
@@ -89,9 +88,12 @@ def main() -> None:
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s | %(levelname)5s | %(name)s | %(message)s",
     )
+
     logger = logging.getLogger("run_memecoin_runtime")
 
     logger.info("=== RUN_MEMECOIN_RUNTIME (PAPER) ===")
+
+    # build runtime (wallets + exec + strat) à partir de config.json
     runtime = build_default_runtime(logger_=logger)
 
     # Override runtime config from CLI
@@ -138,3 +140,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
