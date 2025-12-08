@@ -415,6 +415,9 @@ TEMP/scripts/monitor_m10_finance.py
 TEMP/scripts/Nouveau document
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/Nouveau document
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/Nouveau document
+TEMP/scripts/report_m10_status_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/report_m10_status_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/report_m10_status_v2.py
 TEMP/scripts/reset_trades.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/reset_trades.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/reset_trades.py
@@ -427,6 +430,9 @@ TEMP/scripts/run_finance_jobs_vm.sh
 TEMP/scripts/run_m10_memecoin_runtime.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/run_m10_memecoin_runtime.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/run_m10_memecoin_runtime.py
+TEMP/scripts/run_m10_memecoin_runtime_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/run_m10_memecoin_runtime_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/run_m10_memecoin_runtime_v2.py
 TEMP/scripts/run_memecoin_runtime.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/run_memecoin_runtime.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/run_memecoin_runtime.py
@@ -472,6 +478,9 @@ TEMP/scripts/start_godmode_all.sh
 TEMP/scripts/start_godmode_m10.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/start_godmode_m10.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/start_godmode_m10.py
+TEMP/scripts/start_godmode_m10_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/start_godmode_m10_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/start_godmode_m10_v2.py
 TEMP/scripts/start_indexer.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/start_indexer.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/start_indexer.py
@@ -532,6 +541,21 @@ TEMP/scripts/test_live150_finance.py
 TEMP/scripts/test_m10_execution_with_risk_memecoin.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_m10_execution_with_risk_memecoin.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_m10_execution_with_risk_memecoin.py
+TEMP/scripts/test_m10_kill_switch_manual_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_m10_kill_switch_manual_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_m10_kill_switch_manual_v2.py
+TEMP/scripts/test_m10_memecoin_live_pipeline_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_m10_memecoin_live_pipeline_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_m10_memecoin_live_pipeline_v2.py
+TEMP/scripts/test_m10_risk_auto_trip_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_m10_risk_auto_trip_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_m10_risk_auto_trip_v2.py
+TEMP/scripts/test_m10_tx_guard_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_m10_tx_guard_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_m10_tx_guard_v2.py
+TEMP/scripts/test_m11_godmode_endpoints_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_m11_godmode_endpoints_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_m11_godmode_endpoints_v2.py
 TEMP/scripts/test_memecoin_paper_trades_sol.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/test_memecoin_paper_trades_sol.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/test_memecoin_paper_trades_sol.py
