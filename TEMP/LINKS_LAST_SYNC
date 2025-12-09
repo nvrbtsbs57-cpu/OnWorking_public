@@ -310,15 +310,33 @@ TEMP/bot/wallets/runtime_manager.py
 TEMP/config.json
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/config.json
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/config.json
+TEMP/godmode_dashboard.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/godmode_dashboard.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/godmode_dashboard.py
+TEMP/index.html
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/index.html
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/index.html
 TEMP/LINKS_LAST_SYNC
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/LINKS_LAST_SYNC
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/LINKS_LAST_SYNC
+TEMP/paper_trader.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/paper_trader.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/paper_trader.py
 TEMP/quick_export_temp.sh
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/quick_export_temp.sh
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/quick_export_temp.sh
 TEMP/run_export_temp.sh
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/run_export_temp.sh
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/run_export_temp.sh
+TEMP/run_m10_memecoin_runtime_v2.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/run_m10_memecoin_runtime_v2.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/run_m10_memecoin_runtime_v2.py
+TEMP/runtime_manager.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/runtime_manager.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/runtime_manager.py
+TEMP/runtime.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/runtime.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/runtime.py
 TEMP/scripts/analyze_trades_feedback.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/analyze_trades_feedback.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/analyze_trades_feedback.py
@@ -604,3 +622,6 @@ TEMP/scripts/wallets_runtime.py
 TEMP/scripts/wallets_runtime_snapshot.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/wallets_runtime_snapshot.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/wallets_runtime_snapshot.py
+TEMP/store.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/store.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/store.py
