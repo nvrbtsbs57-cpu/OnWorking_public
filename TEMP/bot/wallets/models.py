@@ -8,7 +8,6 @@ from decimal import Decimal
 from enum import Enum
 from typing import List, Optional
 
-
 # ============================================================================
 # Enums
 # ============================================================================
@@ -19,15 +18,16 @@ class WalletRole(str, Enum):
     Rôle logique d'un wallet W0–W9.
 
     On colle au mapping métier défini dans la spec :
-      - W0 : vault
-      - W1/W2 : trade_memecoins
-      - W3 : copy_trading
-      - W4 : fees
-      - W5 : profit_box
-      - W6 : stables
-      - W7 : emergency
-      - W8 : sandbox
-      - W9 : payout
+
+    - W0 : vault
+    - W1/W2 : trade_memecoins
+    - W3 : copy_trading
+    - W4 : fees
+    - W5 : profit_box
+    - W6 : stables
+    - W7 : emergency
+    - W8 : sandbox
+    - W9 : payout
     """
 
     VAULT = "vault"
@@ -44,9 +44,27 @@ class WalletRole(str, Enum):
     @classmethod
     def _missing_(cls, value: object) -> "WalletRole":  # type: ignore[override]
         """
-        Si on reçoit une valeur inconnue depuis config.json, on fallback sur OTHER
-        au lieu de lever une ValueError. Ça évite de casser au chargement.
+        Mapping tolérant des valeurs venant de config.json.
+
+        - "SCALPING" / "scalping"  -> TRADE_MEMECOINS (wallets de trading memecoins)
+        - "PROFITS" / "profits"    -> PROFIT_BOX (boîte à profits)
+        - Tout le reste            -> OTHER
+
+        On continue donc à ne jamais lever de ValueError lors du parsing
+        des rôles de wallets : en cas de valeur inconnue, on tombe sur OTHER.
         """
+        if isinstance(value, str):
+            v = value.strip().lower()
+
+            alias_map = {
+                "scalping": cls.TRADE_MEMECOINS,
+                "profits": cls.PROFIT_BOX,
+            }
+
+            if v in alias_map:
+                return alias_map[v]
+
+        # fallback par défaut : rôle inconnu → OTHER
         return cls.OTHER
 
 
@@ -62,7 +80,7 @@ class ProfitSplitRule:
 
     - source_wallet_id : ex "W1", "W2"
     - target_wallet_id : ex "W0" (vault), "W5" (profit_box)
-    - trigger_pct      : seuil de déclenchement (ex: 10% de gain)
+    - trigger_pct : seuil de déclenchement (ex: 10% de gain)
     - percent_of_profit: % du profit à transférer une fois le seuil atteint
     """
 
@@ -75,7 +93,8 @@ class ProfitSplitRule:
 @dataclass
 class WalletConfig:
     """
-    Configuration statique d'un wallet logique (W0–W9) issue de config.json["wallets"]["definitions"].
+    Configuration statique d'un wallet logique (W0–W9) issue de
+    config.json["wallets"]["definitions"].
 
     Les montants sont en USD notionnels.
     """
@@ -84,19 +103,14 @@ class WalletConfig:
     role: WalletRole
     chain: str
     base_ccy: str
-
     initial_balance_usd: Decimal = Decimal("0")
     min_balance_usd: Decimal = Decimal("0")
-
     # % du capital max à risquer par trade
     max_risk_pct_per_trade: Decimal = Decimal("1")
-
     # Perte journalière max en % du capital (None = pas de limite wallet-level)
     max_daily_loss_pct: Optional[Decimal] = None
-
     # Autorise-t-on ce wallet à envoyer des fonds vers d'autres wallets ?
     allow_outflows: bool = True
-
     # Ce wallet peut-il recevoir les flux d'auto-fees (W4 par ex) ?
     is_auto_fees_target: bool = False
 
@@ -108,7 +122,6 @@ class WalletFlowsConfig:
     """
 
     auto_fees_wallet_id: Optional[str]
-
     # Intervalle min / max d'auto-fees en % (indicatif pour plus tard).
     min_auto_fees_pct: Decimal
     max_auto_fees_pct: Decimal
@@ -121,16 +134,12 @@ class WalletFlowsConfig:
     profit_split_rules: List[ProfitSplitRule] = field(default_factory=list)
 
     # --- Nouveau : policy du wallet de fees ---
-
     # Buffer minimal conseillé (nominal en USD). Utilisé pour l'alerting/UI.
     fees_min_buffer_usd: Decimal = Decimal("0")
-
     # Cap max du wallet de fees en % de l'equity totale (0.10 = 10 %)
     fees_max_equity_pct: Optional[Decimal] = None
-
     # Cible de sweep quand le cap est dépassé (ex: "vault")
     fees_over_cap_target_wallet_id: Optional[str] = None
-
 
 
 # ============================================================================
@@ -150,7 +159,6 @@ class WalletState:
 
     id: str
     balance_usd: Decimal
-
     last_reset_date: date = field(default_factory=lambda: date.today())
     realized_pnl_today_usd: Decimal = Decimal("0")
     gross_pnl_today_usd: Decimal = Decimal("0")
@@ -163,10 +171,10 @@ class TradeRiskRequest:
     """
     Requête de validation d'un trade pour un wallet logique.
 
-    - wallet_id              : ex "W1"
-    - symbol                 : marché concerné (optionnel, pour l'extension per-market)
+    - wallet_id : ex "W1"
+    - symbol : marché concerné (optionnel, pour l'extension per-market)
     - requested_notional_usd : taille souhaitée en USD
-    - timestamp              : horodatage pour gestion du reset journalier
+    - timestamp : horodatage pour gestion du reset journalier
     """
 
     wallet_id: str
@@ -180,9 +188,10 @@ class TradeRiskDecision:
     """
     Réponse du moteur de wallets pour un trade donné.
 
-    - approved               : True si OK
-    - max_allowed_notional_usd : taille max autorisée (peut être < requested_notional_usd)
-    - reason                 : raison de refus / réduction (ou None si OK)
+    - approved : True si OK
+    - max_allowed_notional_usd : taille max autorisée
+      (peut être < requested_notional_usd)
+    - reason : raison de refus / réduction (ou None si OK)
     """
 
     approved: bool
@@ -199,3 +208,4 @@ __all__ = [
     "TradeRiskRequest",
     "TradeRiskDecision",
 ]
+
