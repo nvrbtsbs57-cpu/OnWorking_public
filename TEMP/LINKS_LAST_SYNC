@@ -352,6 +352,9 @@ TEMP/LOG_CHAT.md
 TEMP/paper_trader.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/paper_trader.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/paper_trader.py
+TEMP/pipeline.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/pipeline.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/pipeline.py
 TEMP/PLAN_TRAVAIL.md
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/PLAN_TRAVAIL.md
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/PLAN_TRAVAIL.md
@@ -490,6 +493,9 @@ TEMP/scripts/start_memecoin_daemon.py
 TEMP/scripts/start_normalizer.py
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/start_normalizer.py
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/start_normalizer.py
+TEMP/scripts/sync_bot_structure_db.py
+  RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/sync_bot_structure_db.py
+  BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/sync_bot_structure_db.py
 TEMP/scripts/sync_m10_to_temp
   RAW  : https://raw.githubusercontent.com/nvrbtsbs57-cpu/OnWorking_public/refs/heads/main/TEMP/scripts/sync_m10_to_temp
   BLOB : https://github.com/nvrbtsbs57-cpu/OnWorking_public/blob/main/TEMP/scripts/sync_m10_to_temp
