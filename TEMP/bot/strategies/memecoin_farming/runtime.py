@@ -7,7 +7,8 @@ import time
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence, Tuple, Protocol
+
 
 from bot.core.logging import get_logger, setup_logging
 from bot.wallets.runtime_manager import RuntimeWalletManager

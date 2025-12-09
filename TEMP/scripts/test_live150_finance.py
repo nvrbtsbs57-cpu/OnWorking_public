@@ -57,19 +57,65 @@ def build_manager(label: str) -> RuntimeWalletManager:
 
 
 def print_snapshot(manager: RuntimeWalletManager, title: str) -> None:
+    """
+    Affiche un snapshot lisible en CLI à partir du RuntimeWalletManager.
+
+    Le RuntimeWalletManager.debug_snapshot() renvoie un dict de la forme :
+    {
+        "updated_at": "...",
+        "wallets_source": "runtime_manager",
+        "wallets": {
+            "sniper_sol": {
+                "balance_usd": "...",
+                "realized_pnl_today_usd": "...",
+                "gross_pnl_today_usd": "...",
+                "fees_paid_today_usd": "...",
+                "consecutive_losing_trades": 0,
+                "last_reset_date": "..."
+            },
+            ...
+        },
+        "wallets_count": 10,
+        "equity_total_usd": 150.0,
+        "pnl_today_total_usd": ...,
+        "pnl_day": {...},
+        "profile_id": "LIVE_150"
+    }
+    """
     snap = manager.debug_snapshot()
     total_equity = manager.get_total_equity_usd()
+    equity_from_snapshot = snap.get("equity_total_usd")
 
     print(f"\n=== {title} ===")
-    print(f"Total equity (USD) : {total_equity}")
+    print(f"Total equity (manager.get_total_equity_usd) : {total_equity}")
+    if equity_from_snapshot is not None:
+        print(f"equity_total_usd (snapshot)               : {equity_from_snapshot}")
+
+    wallets = snap.get("wallets") or {}
+    if not isinstance(wallets, dict):
+        print("  [WARN] snapshot['wallets'] n'est pas un dict, snapshot brut :")
+        print(snap)
+        print(f"(snapshot écrit dans : {RUNTIME_WALLETS_PATH})")
+        return
+
     print("Wallets:")
-    for wid in sorted(snap.keys()):
-        w = snap[wid]
-        bal = w.get("balance_usd")
-        pnl_today = w.get("realized_pnl_today_usd")
-        gross_pnl = w.get("gross_pnl_today_usd")
-        fees = w.get("fees_paid_today_usd")
-        losers = w.get("consecutive_losing_trades")
+    for wid in sorted(wallets.keys()):
+        w = wallets[wid]
+
+        # Compat legacy : si jamais w est un float (ancien format)
+        if not isinstance(w, dict):
+            bal = w
+            pnl_today = None
+            gross_pnl = None
+            fees = None
+            losers = None
+        else:
+            bal = w.get("balance_usd")
+            pnl_today = w.get("realized_pnl_today_usd")
+            gross_pnl = w.get("gross_pnl_today_usd")
+            fees = w.get("fees_paid_today_usd")
+            losers = w.get("consecutive_losing_trades")
+
         print(
             f"- {wid:<12} "
             f"balance={bal}  pnl_today={pnl_today}  gross_pnl={gross_pnl}  "
@@ -215,3 +261,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
