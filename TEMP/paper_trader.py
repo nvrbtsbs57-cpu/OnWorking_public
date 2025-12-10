@@ -75,6 +75,11 @@ class PaperTrader:
     - journalise les trades dans un TradeStore
     - calcule un PnL agrégé via TradeStore.compute_pnl()
     - expose un AgentStatus lisible par le runtime / wallet manager / dashboard
+
+    M11 : prise en charge des prix "réels" via:
+      - prix fournis dans `prices[(chain, symbol)]` (PriceProvider)
+      - ou `signal.entry_price`
+      - fallback 1.0 seulement si aucun prix dispo, avec flag meta["price_missing"] = True
     """
 
     def __init__(self, config: PaperTraderConfig, store: Optional[TradeStore] = None) -> None:
@@ -152,28 +157,72 @@ class PaperTrader:
 
         raise ValueError(f"PaperTrader._normalize_side: side inconnu: {side!r}")
 
-    def _ensure_price(self, signal: Any) -> Decimal:
+    def _ensure_price(
+        self,
+        *,
+        signal: Any,
+        chain: str,
+        symbol: str,
+        prices: Optional[Dict[Tuple[str, str], Any]] = None,
+    ) -> Tuple[Decimal, bool, str]:
         """
-        Garantit un Decimal pour le prix.
+        Garantit un Decimal pour le prix et retourne aussi:
+          - un booléen `price_missing` (True si fallback)
+          - une string `price_source` pour debug ("price_provider", "signal_entry_price", "fallback_1.0")
 
-        Le signal peut venir :
-          - du TradeSignal interne,
-          - ou de bot.core.signals.TradeSignal (entry_price souvent float).
+        Ordre de priorité:
+          1) prices[(chain, symbol)] si fourni
+          2) signal.entry_price
+          3) fallback 1.0 avec flag price_missing=True
         """
-        price = getattr(signal, "entry_price", None)
 
-        if price is None:
-            # Stub : si pas de prix, on garde un prix neutre à 1.0
-            return Decimal("1.0")
+        # 1) Prix fourni par PriceProvider (prices dict)
+        if prices is not None:
+            raw_mp = prices.get((chain, symbol))
+            if raw_mp is not None:
+                if isinstance(raw_mp, Decimal):
+                    if raw_mp > 0:
+                        return raw_mp, False, "price_provider"
+                else:
+                    try:
+                        price = Decimal(str(raw_mp))
+                        if price > 0:
+                            return price, False, "price_provider"
+                    except Exception:
+                        logger.warning(
+                            "PaperTrader: mark_price invalide %r pour %s/%s, ignoré",
+                            raw_mp,
+                            chain,
+                            symbol,
+                        )
 
-        if isinstance(price, Decimal):
-            return price
+        # 2) Prix fourni directement dans le signal (entry_price)
+        raw_price = getattr(signal, "entry_price", None)
+        if raw_price is not None:
+            if isinstance(raw_price, Decimal):
+                if raw_price > 0:
+                    return raw_price, False, "signal_entry_price"
+            else:
+                try:
+                    price = Decimal(str(raw_price))
+                    if price > 0:
+                        return price, False, "signal_entry_price"
+                except Exception:
+                    logger.warning(
+                        "PaperTrader: entry_price invalide %r pour %s/%s, ignoré",
+                        raw_price,
+                        chain,
+                        symbol,
+                    )
 
-        try:
-            return Decimal(str(price))
-        except Exception:
-            logger.warning("PaperTrader: entry_price invalide %r, fallback 1.0", price)
-            return Decimal("1.0")
+        # 3) Fallback 1.0 (price_missing=True)
+        logger.warning(
+            "PaperTrader: aucun prix disponible pour chain=%s symbol=%s "
+            "(ni prices ni entry_price), fallback 1.0 (price_missing=True)",
+            chain,
+            symbol,
+        )
+        return Decimal("1.0"), True, "fallback_1.0"
 
     def _compute_simulated_pnl_and_fees(
         self,
@@ -185,15 +234,26 @@ class PaperTrader:
         entry_price: Decimal,
         notional_usd: Decimal,
         prices: Optional[Dict[Tuple[str, str], Any]] = None,
+        price_missing: bool = False,
     ) -> Tuple[Decimal, Decimal]:
         """
         Calcule un PnL et des fees simulés pour CE trade uniquement.
 
         - Si un prix de marché est présent dans `prices[(chain, symbol)]`,
           on fait un mark-to-market simple.
-        - Sinon, PnL = 0 (stub propre, pipeline prêt pour la suite).
-        - Fees = notional * self._fee_rate.
+        - Si `price_missing=True`, on renvoie PnL=0 et fees=0 (mode safe).
+        - Sinon, PnL=0 si pas de prix marché exploitable.
+        - Fees = notional * self._fee_rate quand price_missing=False.
         """
+
+        quant = Decimal("0.00000001")
+
+        # Mode "safe" si aucun prix exploitable
+        if price_missing:
+            pnl_sim = Decimal("0")
+            fees_sim = Decimal("0")
+            return pnl_sim.quantize(quant), fees_sim.quantize(quant)
+
         mark_price: Optional[Decimal] = None
         if prices is not None:
             raw_mp = prices.get((chain, symbol))
@@ -222,7 +282,6 @@ class PaperTrader:
         if self._fee_rate > 0:
             fees_sim = notional_usd * self._fee_rate
 
-        quant = Decimal("0.00000001")
         pnl_sim = pnl_sim.quantize(quant)
         fees_sim = fees_sim.quantize(quant)
 
@@ -244,7 +303,8 @@ class PaperTrader:
         - met à jour le PnL global
         - met à jour l’AgentStatus (utilisé par le runtime / wallet manager)
 
-        NB: `signal` peut être le TradeSignal interne OU un bot.core.signals.TradeSignal.
+        NB: `signal` peut être le TradeSignal interne OU un bot.core.signals.TradeSignal
+            (ou encore le Signal memecoin_farming).
         """
         chain = self._normalize_chain(getattr(signal, "chain", None))
         symbol = self._normalize_symbol(getattr(signal, "symbol", None))
@@ -255,8 +315,13 @@ class PaperTrader:
 
         side = self._normalize_side(raw_side)
 
-        # Prix en Decimal
-        price = self._ensure_price(signal)
+        # Prix + infos de source (PriceProvider / signal / fallback)
+        price, price_missing, price_source = self._ensure_price(
+            signal=signal,
+            chain=chain,
+            symbol=symbol,
+            prices=prices,
+        )
 
         # Notional en Decimal (tolère float / int / Decimal)
         raw_notional = getattr(signal, "notional_usd", Decimal("0"))
@@ -287,14 +352,20 @@ class PaperTrader:
             entry_price=price,
             notional_usd=notional,
             prices=prices,
+            price_missing=price_missing,
         )
 
         # Trade logique (modèle principal)
-        meta = {
-            **(getattr(signal, "meta", {}) or {}),
+        base_meta = getattr(signal, "meta", {}) or {}
+        meta: Dict[str, Any] = {
+            **base_meta,
             "pnl_sim_usd": str(pnl_sim),
             "fees_sim_usd": str(fees_sim),
+            "price_source": price_source,
+            "entry_price_used": str(price),
         }
+        if price_missing:
+            meta["price_missing"] = True
 
         trade = Trade.new(
             chain=chain,
@@ -346,7 +417,8 @@ class PaperTrader:
         logger.info(
             (
                 "PaperTrader: trade simulé id=%s chain=%s symbol=%s side=%s "
-                "notional=%s pnl_trade_usd=%s pnl_sim_usd=%s fees_sim_usd=%s"
+                "notional=%s pnl_trade_usd=%s pnl_sim_usd=%s fees_sim_usd=%s "
+                "price_source=%s price_missing=%s"
             ),
             trade.id,
             trade.chain,
@@ -356,6 +428,8 @@ class PaperTrader:
             trade_pnl,
             pnl_sim,
             fees_sim,
+            price_source,
+            price_missing,
         )
 
         return trade, pnl, self._agent_status
