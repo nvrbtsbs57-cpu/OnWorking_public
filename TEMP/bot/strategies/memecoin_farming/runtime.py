@@ -1,4 +1,3 @@
-# file: bot/strategies/memecoin_farming/runtime.py
 from __future__ import annotations
 
 import json
@@ -161,6 +160,29 @@ class MemecoinRuntimeConfig:
 
 
 # ---------------------------------------------------------------------------
+# Provider de prix (abstraction QuickNode / DEX / autre)
+# ---------------------------------------------------------------------------
+
+class PriceProvider(Protocol):
+    """Provider de prix générique pour le runtime memecoin.
+
+    Implémentation typique : wrapper QuickNode / agrégateur DEX.
+    Le format exact du dict retourné est libre, il est simplement
+    transmis tel quel à ExecutionEngine.execute_signal(..., prices=...).
+    """
+
+    def get_prices(
+        self,
+        *,
+        symbol: str,
+        chain: str,
+        wallet_id: Optional[str] = None,
+    ) -> Dict[str, Decimal]:
+        """Retourne un mapping de prix (ex: {"mid": Decimal("..."), ...})."""
+        ...
+
+
+# ---------------------------------------------------------------------------
 # Objet runtime (boucle principale)
 # ---------------------------------------------------------------------------
 
@@ -187,6 +209,7 @@ class MemecoinRuntime:
         wallet_manager: RuntimeWalletManager,
         execution_engine: ExecutionEngine,
         memecoin_engine: MemecoinStrategyEngine,
+        price_provider: Optional[PriceProvider] = None,
         logger_: Optional[logging.Logger] = None,
     ) -> None:
         self.raw_config = raw_config
@@ -194,6 +217,7 @@ class MemecoinRuntime:
         self.wallet_manager = wallet_manager
         self.execution_engine = execution_engine
         self.memecoin_engine = memecoin_engine
+        self.price_provider = price_provider
         self.log = logger_ or _log
         self._iteration = 0
 
@@ -289,6 +313,7 @@ class MemecoinRuntime:
         1) refresh_balances() sur RuntimeWalletManager (si dispo)
         2) on_tick() sur RuntimeWalletManager (fees, flows, snapshots…)
         3) next_signals() sur MemecoinStrategyEngine
+        2bis) récupération des prix via PriceProvider (si configuré)
         4) exécution de chaque signal via ExecutionEngine
         5) on_tick() sur MemecoinStrategyEngine (hook no-op pour l'instant)
 
@@ -321,11 +346,29 @@ class MemecoinRuntime:
             )
             signals = []
 
+        # 2bis) Récupérer les prix spot via PriceProvider (optionnel)
+        prices: Optional[Dict[str, Decimal]] = None
+        if self.price_provider is not None:
+            try:
+                prices = self.price_provider.get_prices(
+                    symbol=self.config.symbol,
+                    chain=self.config.chain,
+                    wallet_id=self.config.wallet_id,
+                )
+            except Exception:
+                self.log.exception(
+                    "Erreur lors de price_provider.get_prices(symbol=%s, chain=%s, wallet_id=%s)",
+                    self.config.symbol,
+                    self.config.chain,
+                    self.config.wallet_id,
+                )
+                prices = None
+
         # 3) Exécuter les signaux via ExecutionEngine
         executed = 0
         for sig in signals:
             try:
-                self.execution_engine.execute_signal(sig)
+                self.execution_engine.execute_signal(sig, prices=prices)
                 executed += 1
             except Exception:
                 self.log.exception(
@@ -436,12 +479,14 @@ def build_default_runtime(*args: Any, **kwargs: Any) -> MemecoinRuntime:
       runtime = build_default_runtime()
       runtime = build_default_runtime(logger_=logger)
       runtime = build_default_runtime(args_namespace, logger_=logger)
+      runtime = build_default_runtime(args_namespace, logger_=logger, price_provider=provider)
     """
     # 1) Config + logging global
     cfg = load_config()
     setup_logging_from_config(cfg)
 
     logger_: Optional[logging.Logger] = kwargs.get("logger_") or kwargs.get("logger")
+    price_provider: Optional[PriceProvider] = kwargs.get("price_provider")
     log = logger_ or _log
 
     # 2) Builders
@@ -461,6 +506,7 @@ def build_default_runtime(*args: Any, **kwargs: Any) -> MemecoinRuntime:
         wallet_manager=runtime_wallet_manager,
         execution_engine=exec_engine,
         memecoin_engine=memecoin_engine,
+        price_provider=price_provider,
         logger_=log,
     )
 
@@ -468,13 +514,14 @@ def build_default_runtime(*args: Any, **kwargs: Any) -> MemecoinRuntime:
 
     log.info(
         "MemecoinRuntime construit (symbol=%s, chain=%s, wallet_id=%s, "
-        "exec_min=%s, exec_max=%s, sleep=%.2fs)",
+        "exec_min=%s, exec_max=%s, sleep=%.2fs, price_provider=%s)",
         runtime.config.symbol,
         runtime.config.chain,
         runtime.config.wallet_id,
         str(runtime.config.exec_min_notional_usd),
         str(runtime.config.exec_max_notional_usd),
         runtime.config.sleep_seconds,
+        "ON" if price_provider is not None else "OFF",
     )
 
     return runtime
@@ -482,6 +529,7 @@ def build_default_runtime(*args: Any, **kwargs: Any) -> MemecoinRuntime:
 
 __all__ = [
     "MemecoinRuntimeConfig",
+    "PriceProvider",
     "MemecoinRuntime",
     "build_default_runtime",
 ]
